@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Websitino Binaries</title>
+    <style>
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: #ffffff;
+            color: #333333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        h1 {
+            color: #000000;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: #666666;
+            margin-bottom: 1.5rem;
+        }
+
+        .download-container {
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .download-item {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 3px;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .download-button {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background-color: #333333;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .download-button:hover {
+            background-color: #000000;
+        }
+
+        .os-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #999999;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Websitino Binaries</h1>
+        <p class="subtitle">Download the latest version for your operating system</p>
+    </header>
+
+    <div class="download-container">
+        <div class="download-item">
+            <div>
+                <strong>Linux</strong>
+            </div>
+            <a href="/linux/websitino" class="download-button">Download</a>
+        </div>
+
+        <div class="download-item">
+            <div>
+                <strong>macOS</strong>
+            </div>
+            <div>
+                <a href="/macos-13/websitino" class="download-button" style="margin-right: 10px;">Intel (x86_64)</a>
+                <a href="/macos-14/websitino" class="download-button">Apple Silicon (ARM)</a>
+            </div>
+        </div>
+
+        <div class="download-item">
+            <div>
+                <strong>Windows</strong>
+            </div>
+            <a href="/windows/websitino.exe" class="download-button">Download</a>
+        </div>
+    </div>
+
+    <footer>
+        <p><a href="https://github.com/trikko/websitino" style="color: #666666; text-decoration: underline;">Websitino source code on GitHub</a></p>
+    </footer>
+</body>
+</html>
