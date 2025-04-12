@@ -134,6 +134,44 @@
             }
         }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Rileva il sistema operativo dell'utente
+            const userAgent = navigator.userAgent.toLowerCase();
+            let userOS = 'unknown';
+
+            if (userAgent.indexOf('win') !== -1) {
+                userOS = 'windows';
+            } else if (userAgent.indexOf('mac') !== -1) {
+                // Distingue tra Mac Intel e Apple Silicon
+                if (userAgent.indexOf('arm') !== -1 || userAgent.indexOf('apple') !== -1) {
+                    userOS = 'macos-arm';
+                } else {
+                    userOS = 'macos-intel';
+                }
+            } else if (userAgent.indexOf('linux') !== -1 || userAgent.indexOf('x11') !== -1) {
+                userOS = 'linux';
+            }
+
+            // Seleziona i link di download appropriati in base al sistema operativo
+            const downloadLinks = document.querySelectorAll('.download-link');
+            downloadLinks.forEach(link => {
+                // Resetta tutti i link al colore predefinito
+                link.style.backgroundColor = 'var(--primary-color)';
+
+                // Evidenzia il link corrispondente al sistema operativo dell'utente
+                if (userOS === 'windows' && link.getAttribute('href').includes('windows')) {
+                    link.style.backgroundColor = '#28a745'; // Verde
+                } else if (userOS === 'macos-arm' && link.getAttribute('href').includes('macos-14')) {
+                    link.style.backgroundColor = '#28a745'; // Verde
+                } else if (userOS === 'macos-intel' && link.getAttribute('href').includes('macos-13')) {
+                    link.style.backgroundColor = '#28a745'; // Verde
+                } else if (userOS === 'linux' && link.getAttribute('href').includes('linux')) {
+                    link.style.backgroundColor = '#28a745'; // Verde
+                }
+            });
+        });
+    </script>
 </head>
 <body>
     <div class="container">
@@ -147,6 +185,7 @@
                 <h2 class="os-title">Linux</h2>
                 <div class="download-options">
                     <a href="linux/websitino" class="download-link">x86_64</a>
+                    <a href="linux/websitino.deb" class="download-link">deb package</a>
                 </div>
             </div>
 
