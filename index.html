@@ -193,6 +193,48 @@
                 justify-content: center;
             }
         }
+
+        /* Stili per la sezione screenshots */
+        .screenshots-section {
+            margin-bottom: 3rem;
+        }
+
+        .screenshots-section-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .screenshots-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin: 0 auto;
+        }
+
+        .screenshot-item {
+            text-align: center;
+        }
+
+        .screenshot-image {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .screenshot-caption {
+            margin-top: 0.75rem;
+            font-size: 1rem;
+            color: #666;
+        }
+
+        @media (min-width: 768px) {
+            .screenshots-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -250,7 +292,7 @@
     <div class="container">
         <header>
             <h1>Websitino</h1>
-            <p class="subtitle">Download the latest version for your operating system</p>
+            <p class="subtitle">A lightweight static file server for development</p>
         </header>
 
         <div class="install-section">
@@ -289,6 +331,20 @@
                 <h2 class="os-title">Windows</h2>
                 <div class="download-options">
                     <a href="windows/websitino.exe" class="download-link">x86_64</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="screenshots-section">
+            <h3 class="screenshots-section-title">Screenshots</h3>
+            <div class="screenshots-container">
+                <div class="screenshot-item">
+                    <img src="images/desktop.png" alt="Directory listing on desktop" class="screenshot-image">
+                    <p class="screenshot-caption">Directory listing on desktop</p>
+                </div>
+                <div class="screenshot-item">
+                    <img src="images/terminal.png" alt="Terminal view" class="screenshot-image">
+                    <p class="screenshot-caption">Terminal view</p>
                 </div>
             </div>
         </div>
