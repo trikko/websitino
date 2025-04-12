@@ -8,8 +8,8 @@
         :root {
             --primary-color: #0066cc;
             --text-color: #333333;
-            --bg-color: #ffffff;
-            --card-bg: #f9f9f9;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
             --border-color: #e0e0e0;
         }
 
@@ -22,6 +22,10 @@
         body {
             font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background-color: var(--bg-color);
+            background-image:
+                radial-gradient(circle at 25px 25px, rgba(0, 102, 204, 0.05) 2%, transparent 0%),
+                radial-gradient(circle at 75px 75px, rgba(0, 102, 204, 0.05) 2%, transparent 0%);
+            background-size: 100px 100px;
             color: var(--text-color);
             line-height: 1.6;
             padding: 1rem;
@@ -31,6 +35,9 @@
             max-width: 900px;
             margin: 0 auto;
             padding: 2rem 1rem;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
         }
 
         header {
