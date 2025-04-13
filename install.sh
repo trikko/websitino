@@ -19,8 +19,6 @@ case "$OSTYPE" in
       ;;
 esac
 
-paths=$(echo $PATH | tr ":" "\n")
-
 bin_candidate=( "$HOME/.local/bin" "$HOME/.bin" "$HOME/bin" "/usr/local/bin" )
 user_bin_dirs=( )
 sudo_bin_dirs=( )
@@ -28,7 +26,7 @@ sudo_bin_dirs=( )
 # Which dir is writable?
 for p in ${bin_candidate[@]}; do
 
-   if [[ ${paths[@]} =~ $p ]]
+   if [[ ":$PATH:" == *":$p:"* ]]
    then
       if [[ -w $p ]]
       then
