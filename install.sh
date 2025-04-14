@@ -4,9 +4,9 @@ case "$OSTYPE" in
    linux*) PACKAGE="linux/websitino";;
    darwin*)
       if [[ $(uname -m) == "arm64" ]]; then
-         PACKAGE="macos/macos-14/websitino"
+         PACKAGE="macos-14/websitino"
       else
-         PACKAGE="macos/macos-13/websitino"
+         PACKAGE="macos-13/websitino"
       fi
       ;;
    win*)
