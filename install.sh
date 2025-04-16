@@ -58,11 +58,11 @@ fi;
 if [[ ${#sudo_bin_dir[@]} -gt 0 ]]
 then
    echo "websitino will be installated in '${sudo_bin_dir[0]}'"
-   curl -sLo ${sudo_bin_dir[0]}/websitino "https://trikko.github.io/websitino/$PACKAGE"
+   sudo curl -sLo ${sudo_bin_dir[0]}/websitino "https://trikko.github.io/websitino/$PACKAGE"
 
    if [[ $? -eq 0 ]]
    then
-      chmod +x ${sudo_bin_dir[0]}/websitino
+      sudo chmod +x ${sudo_bin_dir[0]}/websitino
       echo "Installed: '${sudo_bin_dir[0]}/websitino'"
       exit 0
    else
