@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-13, macos-14]
+        os: [macos-15, macos-14]
         dc: [ldc-latest]
 
     runs-on: ${{ matrix.os }}
