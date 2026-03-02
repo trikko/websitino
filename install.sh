@@ -3,11 +3,7 @@ echo ""
 case "$OSTYPE" in
    linux*) PACKAGE="linux/websitino";;
    darwin*)
-      if [[ $(uname -m) == "arm64" ]]; then
-         PACKAGE="macos-14/websitino"
-      else
-         PACKAGE="macos-13/websitino"
-      fi
+      PACKAGE="macos-14/websitino"
       ;;
    win*)
       echo "auto-install not supported on windows. Download package here: https://trikko.github.io/websitino/windows/websitino.exe"
