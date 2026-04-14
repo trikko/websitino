@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2025 Andrea Fontana
+Copyright (c) 2025-2026 Andrea Fontana
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -110,8 +110,8 @@ auto staticServe(Request request, Output output)
 				<meta charset="utf-8">
 				<title>%TITLE%</title>
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
+				<script src="https://cdn.jsdelivr.net/npm/marked@18.0.0/lib/marked.umd.min.js"></script>
+				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.9.0/github-markdown.min.css">
 				<style>
 					body { font-family: sans-serif; max-width: 800px; margin: 2em auto; line-height: 1.5; padding: 0 15px; }
 					pre { background-color: #f5f5f5; padding: 1em; border-radius: 5px; overflow-x: auto; }
@@ -316,14 +316,16 @@ void logger(Request request, Output output)
 @onServerInit ServerinoConfig configure(string[] args)
 {
 	ushort port = 8123;
-	string ip = "0.0.0.0";
+	string ip = string.init;
 	string authString;
 
 	bool showHelp;
+	bool ipv6;
 
 	// Parse the command line arguments using std.getopt looking for the --port option.
 	try {
 		showHelp = getopt(args,
+			"6|ipv6", &ipv6,
 			"a|auth", &authString,
 			"b|bind", &ip,
 			"p|port",  &port,
@@ -361,6 +363,7 @@ websitino \x1b[2m[path] [options...]\x1b[0m
  \x1b[1m --auth        -a\x1b[0m  <user:pass>   Set the authentication string. (default: disabled)
  \x1b[1m --port        -p\x1b[0m  <port>        Set the port to listen on. (default: 8123)
  \x1b[1m --bind        -b\x1b[0m  <ip_address>  Set the ip address to listen on. (default: 0.0.0.0)
+ \x1b[1m --ipv6        -6\x1b[0m                Force IPv6 (default: IPv4).
  \x1b[1m --verbose     -v\x1b[0m                Enable request logging (default: disabled).
  \x1b[1m --help        -h\x1b[0m                Show this help.
 
@@ -389,6 +392,14 @@ websitino \x1b[2m[path] [options...]\x1b[0m
 		return ServerinoConfig.create().setReturnCode(1);
 	}
 
+	if (ip.count(':') > 1) ipv6 = true;
+
+	if (ip.empty)
+	{
+		if (ipv6) ip = "::";
+		else ip = "0.0.0.0";
+	}
+
 	singleFile = isFile(pathToServe);
 
 	environment["WEBSITINO_SINGLE_FILE"] = singleFile.to!string;
@@ -401,14 +412,20 @@ websitino \x1b[2m[path] [options...]\x1b[0m
 
 
 	// Return the configuration for the serverino with the port set by the user.
-	return ServerinoConfig.create()
-		.addListener(ip, port)
+	auto config = ServerinoConfig.create()
 		.setLogLevel(LogLevel.info)
 		.setMaxRequestTime(100.msecs)
 		.setMaxRequestSize(1024)
 		.setMaxDynamicWorkerIdling(15.seconds)
 		.setMinWorkers(0)
 		.setMaxWorkers(5);
+
+
+	if (ipv6) config.addListener!(ServerinoConfig.ListenerProtocol.IPV6)(ip, port);
+	else config.addListener!(ServerinoConfig.ListenerProtocol.IPV4)(ip, port);
+
+	return config;
+		
 }
 
 

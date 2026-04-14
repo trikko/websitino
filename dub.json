@@ -2,41 +2,40 @@
 	"authors": [
 		"Andrea Fontana"
 	],
-
-	"description": "File serving, simplified.",
-	"copyright": "Copyright © 2025-, Andrea Fontana",
-
-	"dependencies": {
-		"serverino": "~master"
-	},
-
-	"configurations": [
-
-		{
-			"name": "default",
-			"targetType": "executable"
-		},
-
-		{
-			"name": "linux-static",
-			"targetType": "executable",
-			"dflags": ["-static", "-nodefaultlib"]
-		},
-
-		{
-			"name": "windows-static",
-			"targetType": "executable",
-			"dflags": ["-link-defaultlib-shared=false", "-static"]
-		},
-
-		{
-			"name": "macos-static",
-			"targetType": "executable",
-			"dflags": ["-link-defaultlib-shared=false"]
-		}
-
-	],
-
 	"license": "MIT",
-	"name": "websitino"
+	"copyright": "Copyright © 2025-, Andrea Fontana",
+	"name": "websitino",
+	"description": "File serving, simplified.",
+	"dependencies": {
+		"serverino": "~>0.7.21"
+	},
+	"configurations": [
+		{
+			"targetType": "executable",
+			"name": "default"
+		},
+		{
+			"targetType": "executable",
+			"dflags": [
+				"-static",
+				"-nodefaultlib"
+			],
+			"name": "linux-static"
+		},
+		{
+			"targetType": "executable",
+			"dflags": [
+				"-link-defaultlib-shared=false",
+				"-static"
+			],
+			"name": "windows-static"
+		},
+		{
+			"targetType": "executable",
+			"dflags": [
+				"-link-defaultlib-shared=false"
+			],
+			"name": "macos-static"
+		}
+	]
 }
