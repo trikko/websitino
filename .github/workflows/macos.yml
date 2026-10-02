@@ -38,9 +38,20 @@ jobs:
         VERSION=$(echo ${{ github.ref }} | sed 's/refs\/tags\///')
         echo "enum WEBSITINO_VERSION = \"$VERSION\";" >> source/app.d
 
+    # Link OpenSSL statically: the binary must not depend on Homebrew
+    - name: Static OpenSSL
+      run: |
+        OSSL=$(brew --prefix openssl@3)
+        mkdir -p "$RUNNER_TEMP/ossl"
+        ln -sf "$OSSL/lib/libssl.a" "$OSSL/lib/libcrypto.a" "$RUNNER_TEMP/ossl/"
+        echo "C_INCLUDE_PATH=$OSSL/include" >> $GITHUB_ENV
+        echo "LIBRARY_PATH=$RUNNER_TEMP/ossl" >> $GITHUB_ENV
+
     - name: 'Build & Test'
       run: |
         dub build --compiler=$DC --build=release --config=macos-static
+        otool -L websitino
+        if otool -L websitino | grep -qE 'libssl|libcrypto'; then echo "OpenSSL is linked dynamically"; exit 1; fi
 
     - name: Upload binary as artifact
       uses: actions/upload-artifact@v4

@@ -27,6 +27,7 @@ module app;
 
 import std;
 import serverino;
+import selfsigned;
 
 string pathToServe;
 string fileToServe;
@@ -321,6 +322,9 @@ void logger(Request request, Output output)
 
 	bool showHelp;
 	bool ipv6;
+	bool https;
+	string certFile;
+	string keyFile;
 
 	// Parse the command line arguments using std.getopt looking for the --port option.
 	try {
@@ -333,6 +337,9 @@ void logger(Request request, Output output)
 			"l|list-dirs", &listDirectories,
 			"i|index", &useIndexFile,
 			"v|verbose", &enableLogging,
+			"t|https", &https,
+			"cert", &certFile,
+			"key", &keyFile,
 		).helpWanted;
 	}
 	catch (Exception e) { showHelp = true; }
@@ -353,6 +360,13 @@ void logger(Request request, Output output)
          SetConsoleMode(hOutput, dwMode);
       }
 
+		version(serverino_enable_https) enum httpsHelp =
+" \x1b[1m --https       -t\x1b[0m                Serve over https with a self-signed certificate.
+ \x1b[1m --cert          \x1b[0m  <file>        Serve over https with this certificate (PEM).
+ \x1b[1m --key           \x1b[0m  <file>        The private key of the certificate (PEM).
+";
+		else enum httpsHelp = "";
+
 		string help = "\n\x1b[32mwebsitino ("~ WEBSITINO_VERSION ~") \x1b[0m\nFile serving, simplified.\x1b[0m\n\n\x1b[32mUsage:\x1b[0m
 websitino \x1b[2m[path] [options...]\x1b[0m
 
@@ -365,7 +379,7 @@ websitino \x1b[2m[path] [options...]\x1b[0m
  \x1b[1m --bind        -b\x1b[0m  <ip_address>  Set the ip address to listen on. (default: 0.0.0.0)
  \x1b[1m --ipv6        -6\x1b[0m                Force IPv6 (default: IPv4).
  \x1b[1m --verbose     -v\x1b[0m                Enable request logging (default: disabled).
- \x1b[1m --help        -h\x1b[0m                Show this help.
+" ~ httpsHelp ~ " \x1b[1m --help        -h\x1b[0m                Show this help.
 
 \x1b[32mFeatures:\x1b[0m
  \x1b[1m Markdown rendering\x1b[0m              Add ?format to any .md file URL to render it as HTML.
@@ -389,6 +403,44 @@ websitino \x1b[2m[path] [options...]\x1b[0m
 	if (!exists(pathToServe))
 	{
 		writeln(i"\x1b[31mError:\x1b[0m path to serve does not exist. Run \x1b[1m$(args[0].baseName) --help\x1b[0m for more information.");
+		return ServerinoConfig.create().setReturnCode(1);
+	}
+
+	if (!certFile.empty || !keyFile.empty)
+	{
+		if (certFile.empty || keyFile.empty)
+		{
+			writeln(i"\x1b[31mError:\x1b[0m --cert and --key must be used together. Run \x1b[1m$(args[0].baseName) --help\x1b[0m for more information.");
+			return ServerinoConfig.create().setReturnCode(1);
+		}
+
+		https = true;
+	}
+
+	Https certificates;
+
+	version(serverino_enable_https)
+	{
+		if (https && certFile.empty)
+		{
+			try {
+				auto selfSigned = selfSignedCertificate();
+				certFile = selfSigned[0];
+				keyFile = selfSigned[1];
+			}
+			catch (Exception e) {
+				writeln(i"\x1b[31mError:\x1b[0m can't create a self-signed certificate: $(e.msg)");
+				return ServerinoConfig.create().setReturnCode(1);
+			}
+
+			writeln(i"Using a self-signed certificate: $(certFile)\nYour browser will ask you to accept it the first time.");
+		}
+
+		if (https) certificates = Https(certFile, keyFile);
+	}
+	else if (https)
+	{
+		writeln(i"\x1b[31mError:\x1b[0m https is not available on this platform.");
 		return ServerinoConfig.create().setReturnCode(1);
 	}
 
@@ -420,6 +472,16 @@ websitino \x1b[2m[path] [options...]\x1b[0m
 		.setMinWorkers(0)
 		.setMaxWorkers(5);
 
+
+	version(serverino_enable_https)
+	{
+		if (https)
+		{
+			if (ipv6) config.addListener!(ServerinoConfig.ListenerProtocol.IPV6)(ip, port, certificates);
+			else config.addListener!(ServerinoConfig.ListenerProtocol.IPV4)(ip, port, certificates);
+			return config;
+		}
+	}
 
 	if (ipv6) config.addListener!(ServerinoConfig.ListenerProtocol.IPV6)(ip, port);
 	else config.addListener!(ServerinoConfig.ListenerProtocol.IPV4)(ip, port);

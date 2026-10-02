@@ -20,7 +20,10 @@
 				"-static",
 				"-nodefaultlib"
 			],
-			"name": "linux-static"
+			"name": "linux-static",
+			"subConfigurations": {
+				"serverino": "https"
+			}
 		},
 		{
 			"targetType": "executable",
@@ -35,7 +38,10 @@
 			"dflags": [
 				"-link-defaultlib-shared=false"
 			],
-			"name": "macos-static"
+			"name": "macos-static",
+			"subConfigurations": {
+				"serverino": "https"
+			}
 		}
 	]
 }

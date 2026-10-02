@@ -6,12 +6,13 @@ Inspired by [aferust](https://github.com/aferust/servefolder/).
 
 ## Features
 
-- **Tiny footprint**: Only ~1.5MB, no external dependencies
+- **Small footprint**: A single ~7MB executable, no external dependencies
 - **Zero installation**: Single portable executable
 - **Fast & efficient**: Built for performance
 - **Cross-platform**: Works on Linux, macOS and Windows
 - **Secure by default**: Hidden files/directories not served unless explicitly enabled
 - **Markdown rendering**: Add `?format` to any .md file URL to render it as HTML
+- **HTTPS**: With a self-signed certificate or your own (Linux and macOS)
 
 ## Quick install
 
@@ -29,6 +30,17 @@ Alternatively, if you have the [D programming language](https://dlang.org) compi
 Run `websitino` in your project directory to start serving files immediately.
 
 To enable directory listing, use `websitino --list-dirs`. You can also use `websitino --index` to automatically serve index.html files when present in directories.
+
+### HTTPS
+
+Some browser features work only in a secure context. Run `websitino --https` to serve over https
+with a self-signed certificate: websitino creates it the first time and keeps it, so your browser
+asks you to accept it only once. It is valid for `localhost`, `127.0.0.1` and `::1`.
+
+To use your own certificate instead: `websitino --cert server.crt --key server.key` (PEM files).
+
+HTTPS is available in the Linux and macOS builds. To build it from source you need OpenSSL:
+`dub build --override-config=serverino/https`.
 
 For a complete list of available options, run `websitino --help`.
 
