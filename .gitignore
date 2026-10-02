@@ -1,7 +1,8 @@
 .dub
 docs.json
 __dummy.html
-docs/
+docs/*
+!docs/logo.svg
 /websitino
 websitino.so
 websitino.dylib
