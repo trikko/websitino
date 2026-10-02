@@ -42,14 +42,17 @@ jobs:
     - name: Static OpenSSL
       run: |
         OSSL=$(brew --prefix openssl@3)
-        # ld picks a dylib over an archive: remove the dylibs on this throwaway runner
-        rm -f "$OSSL"/lib/libssl*.dylib "$OSSL"/lib/libcrypto*.dylib
+        # ld picks a dylib over an archive: move the dylibs away while linking (curl needs them later)
+        mkdir -p "$RUNNER_TEMP/dylibs"
+        mv "$OSSL"/lib/libssl*.dylib "$OSSL"/lib/libcrypto*.dylib "$RUNNER_TEMP/dylibs/"
+        echo "OSSL=$OSSL" >> $GITHUB_ENV
         echo "C_INCLUDE_PATH=$OSSL/include" >> $GITHUB_ENV
         echo "LIBRARY_PATH=$OSSL/lib" >> $GITHUB_ENV
 
     - name: 'Build & Test'
       run: |
         dub build --compiler=$DC --build=release --config=macos-static
+        mv "$RUNNER_TEMP"/dylibs/* "$OSSL/lib/"
         otool -L websitino
         if otool -L websitino | grep -qE 'libssl|libcrypto'; then echo "OpenSSL is linked dynamically"; exit 1; fi
 
