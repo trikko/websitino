@@ -1,0 +1,15 @@
+# websitino
+
+> A static file server in a single executable, with no dependencies: run it in a folder and the
+> folder is served over http or https. For previewing static sites, opening a project from a
+> phone on the LAN, sharing files, copying them to another machine with curl or wget.
+
+- Install: `curl https://trikko.github.io/websitino/install.sh | bash` (Linux, macOS), or download from https://trikko.github.io/websitino/ (also Windows)
+- Usage: `websitino [path] [options]`; `-i` serve index.html, `-l` list folders (plain text for curl/wget), `-b 127.0.0.1` this machine only, `-p` port (default 8123), `-a user:pass` password, `-t`/`--https` self-signed https, `--cert`/`--key` own certificate (https on Linux and macOS only), `file.md?format` renders Markdown
+- http://localhost is already a secure context for browsers: https is needed only when opening the page from another device
+
+## Docs
+
+- [SKILL.md](https://trikko.github.io/websitino/SKILL.md): how an AI agent should use websitino, as a skill
+- [AGENTS.md](https://trikko.github.io/websitino/AGENTS.md): the same, without the front matter
+- [README](https://github.com/trikko/websitino)
