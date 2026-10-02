@@ -39,6 +39,7 @@ bool listDirectories;
 bool singleFile;
 bool enableLogging = false;
 bool useIndexFile = false;
+string[] startupWarnings;
 
 mixin ServerinoMain;
 
@@ -314,6 +315,12 @@ void logger(Request request, Output output)
 }
 
 // Serverino configuration and command line arguments parsing.
+// Logged when the daemon starts, so it uses serverino's logger
+@onDaemonStart void showWarnings()
+{
+	foreach (w; startupWarnings) warning(w);
+}
+
 @onServerInit ServerinoConfig configure(string[] args)
 {
 	ushort port = 8123;
@@ -433,7 +440,8 @@ websitino \x1b[2m[path] [options...]\x1b[0m
 				return ServerinoConfig.create().setReturnCode(1);
 			}
 
-			writeln(i"Using a self-signed certificate: $(certFile)\nYour browser will ask you to accept it the first time.");
+			startupWarnings ~= i"Using a self-signed certificate: $(certFile)".text;
+			startupWarnings ~= "Your browser will ask you to accept it the first time.";
 		}
 
 		if (https) certificates = Https(certFile, keyFile);
