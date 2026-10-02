@@ -42,10 +42,10 @@ jobs:
     - name: Static OpenSSL
       run: |
         OSSL=$(brew --prefix openssl@3)
-        mkdir -p "$RUNNER_TEMP/ossl"
-        ln -sf "$OSSL/lib/libssl.a" "$OSSL/lib/libcrypto.a" "$RUNNER_TEMP/ossl/"
+        # ld picks a dylib over an archive: remove the dylibs on this throwaway runner
+        rm -f "$OSSL"/lib/libssl*.dylib "$OSSL"/lib/libcrypto*.dylib
         echo "C_INCLUDE_PATH=$OSSL/include" >> $GITHUB_ENV
-        echo "LIBRARY_PATH=$RUNNER_TEMP/ossl" >> $GITHUB_ENV
+        echo "LIBRARY_PATH=$OSSL/lib" >> $GITHUB_ENV
 
     - name: 'Build & Test'
       run: |
