@@ -7,7 +7,7 @@
 	"name": "websitino",
 	"description": "File serving, simplified.",
 	"dependencies": {
-		"serverino": "~>0.7.21"
+		"serverino": "~>0.8.5"
 	},
 	"configurations": [
 		{

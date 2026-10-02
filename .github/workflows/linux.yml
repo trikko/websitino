@@ -29,7 +29,7 @@ jobs:
     - name: Build Docker image
       run: |
         echo "FROM alpine:latest
-        RUN apk add vim gcc musl-dev ldc dub llvm-libunwind-static openssl-libs-static gzip upx cmake make
+        RUN apk add vim gcc musl-dev ldc dub llvm-libunwind-static openssl-libs-static zlib-static gzip upx cmake make
         WORKDIR /app
         COPY . .
         CMD [\"dub\", \"build\", \"--build=release\", \"--config=linux-static\"]" > Dockerfile
@@ -38,7 +38,7 @@ jobs:
     # Run the Docker container to build the project
     - name: Run Docker container and build project
       run: |
-        docker run --name websitino-container websitino-image || true
+        docker run --name websitino-container websitino-image
 
     # Copy compiled file from Docker container to host
     - name: Copy compiled binary

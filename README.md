@@ -1,3 +1,5 @@
+<img align="left" alt="websitino logo" width="100" height="100" src="https://github.com/trikko/websitino/raw/main/docs/logo.svg">
+
 # Websitino
 
 A lightweight static file server for local development. Perfect for testing static websites and serving files with minimal setup.
