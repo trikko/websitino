@@ -110,7 +110,7 @@ auto staticServe(Request request, Output output)
 				<meta charset="utf-8">
 				<title>%TITLE%</title>
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<script src="https://cdn.jsdelivr.net/npm/marked@18.0.0/lib/marked.umd.min.js"></script>
+				<script src="https://cdn.jsdelivr.net/npm/marked@18.0.14/lib/marked.umd.min.js"></script>
 				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.9.0/github-markdown.min.css">
 				<style>
 					body { font-family: sans-serif; max-width: 800px; margin: 2em auto; line-height: 1.5; padding: 0 15px; }
