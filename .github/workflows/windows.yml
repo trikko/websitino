@@ -41,6 +41,10 @@ jobs:
       run: |
         dub build --compiler=ldc2 --build=release --config=windows-static
 
+    - name: Smoke test
+      shell: bash
+      run: tests/smoke.sh ./websitino.exe --no-https
+
     - name: Upload binary as artifact
       uses: actions/upload-artifact@v4
       with:

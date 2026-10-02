@@ -53,6 +53,9 @@ jobs:
         otool -L websitino
         if otool -L websitino | grep -qE 'libssl|libcrypto'; then echo "OpenSSL is linked dynamically"; exit 1; fi
 
+    - name: Smoke test
+      run: tests/smoke.sh ./websitino
+
     - name: Upload binary as artifact
       uses: actions/upload-artifact@v4
       with:

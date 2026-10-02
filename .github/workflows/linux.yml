@@ -47,6 +47,9 @@ jobs:
         docker rm websitino-container
         strip -s websitino
 
+    - name: Smoke test
+      run: tests/smoke.sh ./websitino
+
     - name: Create deb package
       run: |
         if [[ "${{ github.ref }}" == refs/tags/* ]]; then
