@@ -18,7 +18,8 @@
 			"targetType": "executable",
 			"dflags": [
 				"-static",
-				"-nodefaultlib"
+				"-nodefaultlib",
+				"-Xcc=-no-pie"
 			],
 			"name": "linux-static",
 			"subConfigurations": {
