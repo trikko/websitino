@@ -41,12 +41,18 @@ jobs:
         cp dist/linux/websitino dist/linux/websitino.deb public/linux/
         cp dist/linux-arm64/websitino dist/linux-arm64/websitino.deb public/linux-arm64/
         cp dist/websitino.exe/websitino.exe public/windows/
-        for d in dist/websitino-macos-*; do
-          os=${d#dist/websitino-}
-          mkdir -p "public/$os"
-          cp "$d/websitino" "public/$os/"
+        for arch in arm64 x86_64; do
+          mkdir -p "public/macos-$arch"
+          cp "dist/macos-$arch/websitino" "public/macos-$arch/"
         done
-        chmod +x public/linux/websitino public/linux-arm64/websitino public/macos-*/websitino
+        # The old folders, one per runner, for the links already around
+        for d in macos-14 macos-15; do
+          mkdir -p "public/$d"
+          cp dist/macos-arm64/websitino "public/$d/"
+        done
+        mkdir -p public/macos-15-intel
+        cp dist/macos-x86_64/websitino public/macos-15-intel/
+        chmod +x public/*/websitino
         find public -type f -exec ls -l {} +
 
     - name: Deploy to GitHub Pages

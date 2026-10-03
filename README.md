@@ -9,7 +9,7 @@ Inspired by [aferust](https://github.com/aferust/servefolder/).
 - **Small footprint**: A single ~7MB executable, no external dependencies
 - **Zero installation**: Single portable executable
 - **Fast & efficient**: Built for performance
-- **Cross-platform**: Works on Linux (x86_64 and arm64), macOS and Windows
+- **Cross-platform**: Works on Linux (x86_64 and arm64), macOS (12 or later) and Windows
 - **Secure by default**: Hidden files/directories not served unless explicitly enabled
 - **Markdown rendering**: Add `?format` to any .md file URL to render it as HTML
 - **HTTPS**: With a self-signed certificate or your own (Linux and macOS)

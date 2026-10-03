@@ -18,8 +18,8 @@ case "$OSTYPE" in
       ;;
    darwin*)
       case "$ARCH" in
-         arm64)  PACKAGE="macos-14/websitino";;
-         x86_64) PACKAGE="macos-15-intel/websitino";;
+         arm64)  PACKAGE="macos-arm64/websitino";;
+         x86_64) PACKAGE="macos-x86_64/websitino";;
          *)
             echo "auto-install not supported on macOS/$ARCH."
             exit 1
