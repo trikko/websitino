@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Websitino</title>
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
     <style>
         :root {
             --primary-color: #0066cc;
@@ -47,6 +48,12 @@
             border-bottom: 1px solid var(--border-color);
         }
 
+        .logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 0.5rem;
+        }
+
         h1 {
             color: #000000;
             margin-bottom: 0.75rem;
@@ -76,18 +83,23 @@
             border-radius: 8px;
             padding: 1.5rem;
             margin: 0 auto 1rem auto;
-            text-align: center;
+            text-align: left;
             border: 1px solid var(--border-color);
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             gap: 15px;
         }
 
         .install-command code {
             font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #333;
+            overflow-wrap: anywhere;
+        }
+
+        .copy-button {
+            flex-shrink: 0;
         }
 
         .copy-button {
@@ -111,6 +123,42 @@
 
         .copy-button:hover {
             background-color: #0055aa;
+        }
+
+        .agent-section {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .agent-section h2 {
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .agent-section p {
+            color: #666666;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 767px) {
+            .install-command {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .install-command .copy-button {
+                align-self: center;
+            }
+        }
+
+        .agent-section a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .agent-section a:hover {
+            text-decoration: underline;
         }
 
         .download-section-title {
@@ -186,6 +234,27 @@
         }
 
         @media (min-width: 768px) {
+            header {
+                display: flex;
+                align-items: center;
+                gap: 1.5rem;
+                text-align: left;
+            }
+
+            .logo {
+                width: 100px;
+                height: 100px;
+                margin-bottom: 0;
+            }
+
+            .header-text h1 {
+                margin-bottom: 0.25rem;
+            }
+
+            .header-text .subtitle {
+                margin-bottom: 0;
+            }
+
             .download-container {
                 grid-template-columns: repeat(3, 1fr);
             }
@@ -280,16 +349,17 @@
                 }
             });
 
-            // Funzione per copiare il comando di installazione
-            document.querySelector('.copy-button').addEventListener('click', function() {
-                const command = document.querySelector('.install-command code').textContent;
-                navigator.clipboard.writeText(command).then(() => {
-                    const button = this;
-                    const originalText = button.textContent;
-                    button.textContent = 'Copied!';
-                    setTimeout(() => {
-                        button.textContent = originalText;
-                    }, 2000);
+            // Funzione per copiare i comandi
+            document.querySelectorAll('.copy-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const command = this.closest('.install-command').querySelector('code').textContent;
+                    navigator.clipboard.writeText(command).then(() => {
+                        const originalHTML = button.innerHTML;
+                        button.textContent = 'Copied!';
+                        setTimeout(() => {
+                            button.innerHTML = originalHTML;
+                        }, 2000);
+                    });
                 });
             });
         });
@@ -298,8 +368,11 @@
 <body>
     <div class="container">
         <header>
-            <h1>Websitino</h1>
-            <p class="subtitle">A lightweight static file server for development • <a href="https://github.com/trikko/websitino" style="color: var(--primary-color); text-decoration: none;">source code</a> • <a href="https://github.com/sponsors/trikko" style="color: var(--primary-color); text-decoration: none;">donate</a></p>
+            <img src="logo.svg" alt="websitino logo" class="logo">
+            <div class="header-text">
+                <h1>Websitino</h1>
+                <p class="subtitle">A lightweight static file server for development • <a href="https://github.com/trikko/websitino" style="color: var(--primary-color); text-decoration: none;">source code</a> • <a href="https://github.com/sponsors/trikko" style="color: var(--primary-color); text-decoration: none;">donate</a></p>
+            </div>
         </header>
 
         <div class="install-section">
@@ -315,7 +388,32 @@
             </div>
         </div>
 
-        <h3 class="download-section-title">Or download the binary files directly</h3>
+        <div class="agent-section">
+            <h2>Using an AI agent?</h2>
+            <p>Ask it to install the websitino skill, so it knows how to preview and share your local files:</p>
+            <div class="install-command">
+                <code>Install the skill at https://trikko.github.io/websitino/SKILL.md. It explains how to use websitino, the static file server I use to preview and share local files.</code>
+                <button class="copy-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                    </svg>
+                    Copy
+                </button>
+            </div>
+            <p>Or install it by hand, for example for Claude Code:</p>
+            <div class="install-command">
+                <code>mkdir -p ~/.claude/skills/websitino &amp;&amp; curl -fsSL -o ~/.claude/skills/websitino/SKILL.md https://trikko.github.io/websitino/SKILL.md</code>
+                <button class="copy-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                    </svg>
+                    Copy
+                </button>
+            </div>
+            <p><a href="SKILL.md">SKILL.md</a> • <a href="AGENTS.md">AGENTS.md</a> • <a href="llms.txt">llms.txt</a> • <a href="https://github.com/trikko/websitino#using-websitino-with-an-ai-agent">paths for other agents</a></p>
+        </div>
+
+        <h3 class="download-section-title">Download the binary files directly</h3>
 
         <div class="download-container">
             <div class="download-card">
