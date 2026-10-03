@@ -188,9 +188,20 @@
             line-height: 1.4;
         }
 
-        .download-note code {
-            font-size: 0.8rem;
-            white-space: nowrap;
+        /* A command inside a download card: same look as the others, smaller, icon-only button */
+        .install-command.compact {
+            flex-direction: row;
+            align-items: center;
+            padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+            margin: 0.5rem 0 0;
+        }
+
+        .install-command.compact code {
+            font-size: 0.85rem;
+        }
+
+        .install-command.compact .copy-button {
+            padding: 6px 8px;
         }
 
         .os-title {
@@ -450,7 +461,15 @@
                     <a href="macos-arm64/websitino" class="download-link">ARM (Apple Silicon)</a>
                 </div>
                 <p class="download-note">macOS 12 or later. Downloaded with a browser, macOS blocks it:
-                    run <code>xattr -c websitino</code> once. The quick install doesn't need it.</p>
+                    run this once in its folder (the quick install doesn't need it).</p>
+                <div class="install-command compact">
+                    <code>xattr -c websitino</code>
+                    <button class="copy-button" title="Copy" aria-label="Copy">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <div class="download-card">
