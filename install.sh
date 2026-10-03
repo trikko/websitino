@@ -1,34 +1,55 @@
+#!/usr/bin/env bash
+# Installs the latest websitino: curl https://trikko.github.io/websitino/install.sh | bash
+
 echo ""
 
+ARCH="$(uname -m)"
+
 case "$OSTYPE" in
-   linux*) PACKAGE="linux/websitino";;
-   darwin*)
-      PACKAGE="macos-14/websitino"
+   linux*)
+      case "$ARCH" in
+         x86_64|amd64)  PACKAGE="linux/websitino";;
+         aarch64|arm64) PACKAGE="linux-arm64/websitino";;
+         *)
+            echo "auto-install not supported on linux/$ARCH."
+            exit 1
+            ;;
+      esac
       ;;
-   win*)
+   darwin*)
+      case "$ARCH" in
+         arm64)  PACKAGE="macos-arm64/websitino";;
+         x86_64) PACKAGE="macos-x86_64/websitino";;
+         *)
+            echo "auto-install not supported on macOS/$ARCH."
+            exit 1
+            ;;
+      esac
+      ;;
+   msys*|cygwin*|win*)
       echo "auto-install not supported on windows. Download package here: https://trikko.github.io/websitino/windows/websitino.exe"
-      return 1
+      exit 1
       ;;
    *)
       echo "$OSTYPE auto-install not supported."
-      return 1
+      exit 1
       ;;
 esac
 
 bin_candidate=( "$HOME/.local/bin" "$HOME/.bin" "$HOME/bin" "/usr/local/bin" )
-user_bin_dirs=( )
-sudo_bin_dirs=( )
+user_bin_dir=( )
+sudo_bin_dir=( )
 
 # Which dir is writable?
-for p in ${bin_candidate[@]}; do
+for p in "${bin_candidate[@]}"; do
 
    if [[ ":$PATH:" == *":$p:"* ]]
    then
       if [[ -w $p ]]
       then
-         user_bin_dir+=($p)
+         user_bin_dir+=("$p")
       else
-         sudo_bin_dir+=($p)
+         sudo_bin_dir+=("$p")
       fi;
    fi;
 
@@ -37,11 +58,9 @@ done;
 # Trying user dir
 if [[ ${#user_bin_dir[@]} -gt 0 ]]
 then
-   curl -sLo ${user_bin_dir[0]}/websitino "https://trikko.github.io/websitino/$PACKAGE"
-
-   if [[ $? -eq 0 ]]
+   if curl -fsLo "${user_bin_dir[0]}/websitino" "https://trikko.github.io/websitino/$PACKAGE"
    then
-      chmod +x ${user_bin_dir[0]}/websitino
+      chmod +x "${user_bin_dir[0]}/websitino"
       echo "Installed: '${user_bin_dir[0]}/websitino'"
       exit 0
    else
@@ -53,12 +72,11 @@ fi;
 # System dir
 if [[ ${#sudo_bin_dir[@]} -gt 0 ]]
 then
-   echo "websitino will be installated in '${sudo_bin_dir[0]}'"
-   sudo curl -sLo ${sudo_bin_dir[0]}/websitino "https://trikko.github.io/websitino/$PACKAGE"
+   echo "websitino will be installed in '${sudo_bin_dir[0]}'"
 
-   if [[ $? -eq 0 ]]
+   if sudo curl -fsLo "${sudo_bin_dir[0]}/websitino" "https://trikko.github.io/websitino/$PACKAGE"
    then
-      sudo chmod +x ${sudo_bin_dir[0]}/websitino
+      sudo chmod +x "${sudo_bin_dir[0]}/websitino"
       echo "Installed: '${sudo_bin_dir[0]}/websitino'"
       exit 0
    else
@@ -69,3 +87,4 @@ fi;
 
 echo "Can't find a directory to install websitino. Please report this issue."
 echo "You can download the binary package here: https://trikko.github.io/websitino/$PACKAGE"
+exit 1
