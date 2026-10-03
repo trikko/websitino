@@ -1,0 +1,58 @@
+name: Release websitino
+
+# The three builds used to publish to gh-pages each on their own, and racing pushes left all
+# but the first one rejected. Here they only build; one job publishes everything at once.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    uses: ./.github/workflows/linux.yml
+  macos:
+    uses: ./.github/workflows/macos.yml
+  windows:
+    uses: ./.github/workflows/windows.yml
+
+  publish:
+    needs: [linux, macos, windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
+
+    steps:
+    - name: Download all binaries
+      uses: actions/download-artifact@v8
+      with:
+        path: dist
+
+    # Artifacts come back without the executable bit, which gh-pages has always served them with.
+    - name: Lay out the gh-pages tree
+      run: |
+        mkdir -p public/linux public/windows
+        cp dist/websitino/websitino dist/websitino.deb/websitino.deb public/linux/
+        cp dist/websitino.exe/websitino.exe public/windows/
+        for d in dist/websitino-macos-*; do
+          os=${d#dist/websitino-}
+          mkdir -p "public/$os"
+          cp "$d/websitino" "public/$os/"
+        done
+        chmod +x public/linux/websitino public/macos-*/websitino
+        find public -type f -exec ls -l {} +
+
+    - name: Deploy to GitHub Pages
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./public
+        force_orphan: false
+        keep_files: true

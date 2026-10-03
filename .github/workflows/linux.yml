@@ -4,14 +4,13 @@ on:
   push:
     branches:
       - main
-    tags:
-      - 'v*'
+  workflow_call:
 
 jobs:
   build-and-export:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
 
     steps:
     # Checkout the repository
@@ -97,29 +96,3 @@ jobs:
       with:
         name: websitino.deb
         path: websitino.deb
-
-
-    - name: Pull latest changes
-      run: |
-        git checkout -- source/app.d
-        git fetch origin
-        git checkout gh-pages
-        git pull origin gh-pages
-
-    # Prepara la directory per GitHub Pages
-    - name: Prepara directory per GitHub Pages
-      if: startsWith(github.ref, 'refs/tags/v')
-      run: |
-        mkdir -p public/linux
-        cp websitino.deb public/linux/websitino.deb
-        cp websitino public/linux/
-
-    # Pubblica su GitHub Pages
-    - name: Deploy su GitHub Pages
-      if: startsWith(github.ref, 'refs/tags/v')
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./public
-        force_orphan: false
-        keep_files: true
