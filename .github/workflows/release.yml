@@ -37,15 +37,16 @@ jobs:
     # Artifacts come back without the executable bit, which gh-pages has always served them with.
     - name: Lay out the gh-pages tree
       run: |
-        mkdir -p public/linux public/windows
-        cp dist/websitino/websitino dist/websitino.deb/websitino.deb public/linux/
+        mkdir -p public/linux public/linux-arm64 public/windows
+        cp dist/linux/websitino dist/linux/websitino.deb public/linux/
+        cp dist/linux-arm64/websitino dist/linux-arm64/websitino.deb public/linux-arm64/
         cp dist/websitino.exe/websitino.exe public/windows/
         for d in dist/websitino-macos-*; do
           os=${d#dist/websitino-}
           mkdir -p "public/$os"
           cp "$d/websitino" "public/$os/"
         done
-        chmod +x public/linux/websitino public/macos-*/websitino
+        chmod +x public/linux/websitino public/linux-arm64/websitino public/macos-*/websitino
         find public -type f -exec ls -l {} +
 
     - name: Deploy to GitHub Pages
@@ -56,3 +57,11 @@ jobs:
         publish_dir: ./public
         force_orphan: false
         keep_files: true
+
+  # Download page and install script after the binaries, so their new links never point to nothing
+  site:
+    needs: publish
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    uses: ./.github/workflows/pages.yml

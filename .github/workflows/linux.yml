@@ -8,7 +8,19 @@ on:
 
 jobs:
   build-and-export:
-    runs-on: ubuntu-latest
+    # Native runners for each architecture: Alpine has ldc for both, no cross-compiling needed
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: amd64
+            dir: linux
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+            dir: linux-arm64
+
+    runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
 
@@ -67,7 +79,7 @@ jobs:
         echo "Version: $VERSION" >> websitino-$VERSION/DEBIAN/control
         echo "Section: web" >> websitino-$VERSION/DEBIAN/control
         echo "Priority: optional" >> websitino-$VERSION/DEBIAN/control
-        echo "Architecture: amd64" >> websitino-$VERSION/DEBIAN/control
+        echo "Architecture: ${{ matrix.arch }}" >> websitino-$VERSION/DEBIAN/control
         echo "Maintainer: Andrea Fontana <me@andreafontana.it>" >> websitino-$VERSION/DEBIAN/control
         echo "Description: A lightweight static file server for local development. Perfect for testing static websites and serving files with minimal setup." >> websitino-$VERSION/DEBIAN/control
 
@@ -83,16 +95,11 @@ jobs:
         rm -rf websitino-$VERSION/*
         mv websitino-$VERSION.deb websitino.deb
 
-    # Upload the binary as an artifact
-    - name: Upload binary as artifact
+    # Binary and deb package together, named after the gh-pages folder they go to
+    - name: Upload binary and deb package as artifact
       uses: actions/upload-artifact@v4
       with:
-        name: websitino
-        path: websitino
-
-    # Upload the deb package as an artifact
-    - name: Upload deb package as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: websitino.deb
-        path: websitino.deb
+        name: ${{ matrix.dir }}
+        path: |
+          websitino
+          websitino.deb

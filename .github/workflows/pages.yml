@@ -1,0 +1,42 @@
+name: Publish site
+
+# The pages on gh-pages (download page, install script, skill) come from site/. They are published
+# with every release, and by hand from the Actions tab when only the pages have changed.
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # The screenshots in images/ are only on gh-pages: keep_files leaves them there.
+    - name: Lay out the site
+      run: |
+        mkdir public
+        cp -a site/. public/
+        cp docs/logo.svg public/
+        # AGENTS.md is SKILL.md without the front matter, for tools that want a rules file
+        awk 'NR == 1 && /^---$/ { fm = 1; next }
+             fm { if (/^---$/) { fm = 0; blank = 1 }; next }
+             blank && /^$/ { blank = 0; next }
+             { blank = 0; print }' site/SKILL.md > public/AGENTS.md
+        find public -type f -exec ls -l {} +
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./public
+        force_orphan: false
+        keep_files: true
