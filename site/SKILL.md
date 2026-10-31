@@ -1,6 +1,6 @@
 ---
 name: websitino
-description: Serve a local folder or file over http(s) with websitino, a single-binary static file server. Use it when the user wants to preview a static site or an html page in the browser, open a project from another device (phone, tablet) on the same network, share files with someone on the LAN or copy them to another machine with curl or wget, render a Markdown file as html, or needs https (a secure context) for a local page.
+description: Serve a local folder or file over http(s) with websitino, a single-binary static file server. Use it when the user wants to preview a static site, a built single page application or an html page in the browser, open a project from another device (phone, tablet) on the same network, share files with someone on the LAN or copy them to another machine with curl or wget, render a Markdown file as html, or needs https (a secure context) for a local page.
 ---
 
 # websitino
@@ -29,6 +29,7 @@ websitino [path] [options]       # path: a folder (default: the current one) or 
 | The user wants to... | Use |
 |---|---|
 | preview a site that has an `index.html` | `-i` (`--index`) |
+| preview a built SPA with client-side routes (`/users/42`) | `--spa` |
 | browse or download the files | `-l` (`--list-dirs`): an html listing in the browser, plain text with curl or wget |
 | see dotfiles too (`.env`, `.github/`) | `-s` (`--show-hidden`): only if asked, they often hold secrets |
 | keep it on this machine only | `-b 127.0.0.1` |
@@ -42,6 +43,19 @@ websitino [path] [options]       # path: a folder (default: the current one) or 
 | share one file only | `websitino path/to/file.zip`, served at `/file.zip` |
 
 `-i` and `-l` together: folders with an `index.html` show the page, the others the listing.
+
+## Single page applications
+
+`--spa` serves the root `index.html` for any path that isn't a file on disk, so the client-side
+router resolves it: a built SPA survives a reload on `/users/42`, and direct links to it work. It
+implies `-i`. Use it for the output of `vite build`, `ng build`, and friends.
+
+- Paths with an extension (`/assets/app-4f2c.js`) are **not** redirected: a missing asset is
+  still a 404, so a wrong bundle path doesn't come back as html.
+- Hash routing (`/#/users/42`) doesn't need `--spa`: the browser never asks the server for the
+  route, `-i` is enough.
+- `--spa` wants a folder, not a single file; with `-l` real folders still show their listing.
+- It warns at startup if there is no `index.html` to fall back to.
 
 ## https: only when it is needed
 
@@ -73,9 +87,9 @@ camera or a PWA, `http://192.168.1.20:8123`): there http is not a secure context
 - Bad options or a missing path: it prints the error and exits with code 1.
 - To check that it works: `curl http://localhost:8123/`. With `-l` this prints the listing as
   plain text, so you can see what the user will see without a browser.
-- It serves files only: `GET` only, no POST, no rewriting, no SPA fallback to `index.html`
-  for unknown paths (they are `404`). For an API or a dev server with hot reload use the
-  project's own tooling.
+- It serves files only: `GET` only, no POST, no rewriting. Unknown paths are `404`, unless
+  `--spa` is set. For an API or a dev server with hot reload use the project's own tooling:
+  websitino serves a built SPA, it doesn't replace `vite dev`.
 - Files are read at every request: edit them and reload the page, no restart needed.
 
 ## From the terminal
@@ -97,6 +111,7 @@ with `curl` or `wget` on the other. No browser needed.
 
 ```sh
 websitino -i                                  # preview the site in the current folder
+websitino dist --spa                          # preview a built SPA, client-side routes included
 websitino dist -i -b 127.0.0.1                # the built site, this machine only
 websitino ~/Downloads/report -l -a ann:s3cret # share a folder on the LAN, with a password
 websitino -i -t                               # https, to open it from a phone

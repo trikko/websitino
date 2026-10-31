@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Serve a random file over http and https and check that curl downloads it intact.
+# Serve a random file over http and https and check that curl downloads it intact,
+# then check that --spa answers unknown routes with the app shell.
 # Usage: tests/smoke.sh path/to/websitino
 set -euo pipefail
 
@@ -27,6 +28,27 @@ check() {
 
 curlopts=()
 check http 8123 http://localhost:8123/test.bin
+
+# --spa: unknown routes get index.html, a missing asset is still a 404
+check_spa() {
+	local port=8125 base=http://localhost:8125 shell='<html>shell</html>'
+	mkdir -p "$work/spa"
+	echo "$shell" > "$work/spa/index.html"
+	"$bin" "$work/spa" -p "$port" --spa > "$work/spa.log" 2>&1 &
+	local pid=$!
+	if ! curl -sf --retry 10 --retry-connrefused --retry-delay 1 "$base/" -o /dev/null; then
+		cat "$work/spa.log"; kill $pid; echo "spa: server did not start"; exit 1
+	fi
+	local bad=""
+	for route in / /deep/route; do
+		[ "$(curl -s "$base$route")" = "$shell" ] || bad="$bad $route"
+	done
+	[ "$(curl -s -o /dev/null -w '%{http_code}' "$base/missing.js")" = 404 ] || bad="$bad /missing.js"
+	kill $pid; wait $pid 2>/dev/null || true
+	if [ -n "$bad" ]; then echo "spa: wrong answer for$bad"; exit 1; fi
+	echo "spa: ok"
+}
+check_spa
 
 if [ "${2:-}" != "--no-https" ]; then
 	# the first run creates the certificate: curl trusts it, so it checks the names too

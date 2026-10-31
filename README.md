@@ -12,6 +12,7 @@ Inspired by [aferust](https://github.com/aferust/servefolder/).
 - **Cross-platform**: Works on Linux (x86_64 and arm64), macOS (12 or later) and Windows
 - **Secure by default**: Hidden files/directories not served unless explicitly enabled
 - **Markdown rendering**: Add `?format` to any .md file URL to render it as HTML
+- **SPA friendly**: `--spa` serves `index.html` for unknown paths, so client-side routes survive a reload
 - **HTTPS**: With a self-signed certificate or your own (Linux and macOS)
 
 ## Quick install
@@ -39,6 +40,19 @@ Run `websitino` in your project directory to start serving files immediately.
 To enable directory listing, use `websitino --list-dirs`. You can also use `websitino --index` to automatically serve index.html files when present in directories.
 
 For a complete list of available options, run `websitino --help`.
+
+### Single page applications
+
+A SPA that uses the history API (React Router, Vue Router, ...) asks the server for paths like
+`/users/42` that don't exist on disk, so reloading the page or opening a link returns a 404.
+
+Run `websitino dist --spa` to serve the root `index.html` for those paths instead, and let the
+client-side router resolve them. It implies `--index`, so `/` serves the page too.
+
+Paths with an extension (`/assets/app.js`, `/logo.png`) still return a real 404 when the file is
+missing, so a wrong bundle path stays easy to spot instead of being answered with HTML.
+
+SPAs with hash routing (`/#/users/42`) don't need this: `websitino --index` is enough.
 
 ### HTTPS
 

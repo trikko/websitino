@@ -39,6 +39,7 @@ bool listDirectories;
 bool singleFile;
 bool enableLogging = false;
 bool useIndexFile = false;
+bool spaFallback = false;
 string[] startupWarnings;
 
 mixin ServerinoMain;
@@ -56,6 +57,21 @@ auto staticServe(Request request, Output output)
 		output.addHeader("Content-Type", "text/plain");
 		output ~= message ~ "\n";
 		return Fallthrough.Yes;
+	}
+
+	// With --spa the client-side router owns the paths that aren't on disk, so send it the app shell.
+	// Paths with an extension stay a 404: a missing .js answered with html only hides the real error.
+	auto serveAppShell(Output output)
+	{
+		if (spaFallback == false || request.path.extension.empty == false)
+			return false;
+
+		string indexPath = buildNormalizedPath(pathToServe, "index.html");
+		if (exists(indexPath) == false || isFile(indexPath) == false)
+			return false;
+
+		output.serveFile(indexPath);
+		return true;
 	}
 
 	// Check if authentication is required.
@@ -88,7 +104,10 @@ auto staticServe(Request request, Output output)
 
 	// If the file doesn't exist, return a 404.
 	if (exists(toServe) == false)
+	{
+		if (serveAppShell(output)) return Fallthrough.Yes;
 		return showError(output, 404, "File not found.");
+	}
 
 	// If the user asked for a file, serve it.
 	if (isFile(toServe) == true)
@@ -176,8 +195,12 @@ auto staticServe(Request request, Output output)
 		}
 
 		// If the user asked for a directory listing, but the listDirectories flag is not set, return a 403.
+		// A route that happens to collide with a real directory gets the app shell instead.
 		if (listDirectories == false)
+		{
+			if (serveAppShell(output)) return Fallthrough.Yes;
 			return showError(output, 403, "Forbidden. Directory listing is disabled.\nTry running websitino with the --list-dirs or -l option.");
+		}
 
 		// Check if the request comes from a browser or CLI
 		auto userAgent = request.header.read("user-agent").toLower;
@@ -343,6 +366,7 @@ void logger(Request request, Output output)
 			"s|show-hidden", &serveHidden,
 			"l|list-dirs", &listDirectories,
 			"i|index", &useIndexFile,
+			"spa", &spaFallback,
 			"v|verbose", &enableLogging,
 			"t|https", &https,
 			"cert", &certFile,
@@ -380,6 +404,7 @@ websitino \x1b[2m[path] [options...]\x1b[0m
 \x1b[32mOptions:\x1b[0m
  \x1b[1m --list-dirs   -l\x1b[0m                Show directory listings (default: disabled).
  \x1b[1m --index       -i\x1b[0m                Use index.html when browsing directories.
+ \x1b[1m --spa           \x1b[0m                Serve index.html for unknown paths (implies --index).
  \x1b[1m --show-hidden -s\x1b[0m                Serve hidden files (default: disabled).
  \x1b[1m --auth        -a\x1b[0m  <user:pass>   Set the authentication string. (default: disabled)
  \x1b[1m --port        -p\x1b[0m  <port>        Set the port to listen on. (default: 8123)
@@ -462,6 +487,21 @@ websitino \x1b[2m[path] [options...]\x1b[0m
 
 	singleFile = isFile(pathToServe);
 
+	if (spaFallback)
+	{
+		if (singleFile)
+		{
+			writeln(i"\x1b[31mError:\x1b[0m --spa needs a directory to serve, not a single file. Run \x1b[1m$(args[0].baseName) --help\x1b[0m for more information.");
+			return ServerinoConfig.create().setReturnCode(1);
+		}
+
+		// The app shell is what every unknown path falls back to, so / must serve it too.
+		useIndexFile = true;
+
+		if (!exists(buildNormalizedPath(pathToServe, "index.html")))
+			startupWarnings ~= "--spa is set but there is no index.html to fall back to: unknown paths stay 404.";
+	}
+
 	environment["WEBSITINO_SINGLE_FILE"] = singleFile.to!string;
 	environment["WEBSITINO_AUTH"] = authString;
 	environment["WEBSITINO_HIDDEN"] = serveHidden.to!string;
@@ -469,6 +509,7 @@ websitino \x1b[2m[path] [options...]\x1b[0m
 	environment["WEBSITINO_PATH"] = pathToServe;
 	environment["WEBSITINO_LOGGING"] = enableLogging.to!string;
 	environment["WEBSITINO_INDEX"] = useIndexFile.to!string;
+	environment["WEBSITINO_SPA"] = spaFallback.to!string;
 
 
 	// Return the configuration for the serverino with the port set by the user.
@@ -510,6 +551,7 @@ void config()
 	singleFile = environment["WEBSITINO_SINGLE_FILE"].to!bool;
 	enableLogging = environment["WEBSITINO_LOGGING"].to!bool;
 	useIndexFile = environment["WEBSITINO_INDEX"].to!bool;
+	spaFallback = environment["WEBSITINO_SPA"].to!bool;
 
 	if (singleFile)
 	{
